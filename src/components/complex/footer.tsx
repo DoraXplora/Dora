@@ -5,10 +5,13 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2 text-sm text-muted-foreground">
           <span>
             Powered by{' '}
-            <a href="https://soo.network" target="_blank">
-              SOON
+            <a
+              className="text-[#9F1B30]"
+              href="https://soo.network"
+              target="_blank"
+            >
+              SOON Blockchain
             </a>{' '}
-            Blockchain
           </span>
           <span className="hidden md:inline">·</span>
           <nav className="flex gap-4">
