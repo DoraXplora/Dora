@@ -19,7 +19,7 @@ import Image from 'next/image';
 const protocols = [
   {
     name: 'Jupiter',
-    image: '/placeholder.svg?height=24&width=24',
+    image: '/placeholder.svg',
     volume: '$2,323,733,010',
     change: '-6.85%',
     transactions: '8,782,935',
@@ -27,7 +27,7 @@ const protocols = [
   },
   {
     name: 'Orca',
-    image: '/placeholder.svg?height=24&width=24',
+    image: '/placeholder.svg',
     volume: '$1,324,939,010',
     change: '+15.52%',
     transactions: '1,130,876',
@@ -35,7 +35,7 @@ const protocols = [
   },
   {
     name: 'Meteora',
-    image: '/placeholder.svg?height=24&width=24',
+    image: '/placeholder.svg',
     volume: '$991,223,550',
     change: '+7.91%',
     transactions: '1,281,535',

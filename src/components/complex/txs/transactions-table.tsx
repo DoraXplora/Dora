@@ -56,7 +56,6 @@ const transactions = [
     fee: '0.000055',
     programs: ['raydium'],
   },
-  // Add more transactions as needed
 ];
 
 export function TransactionsTable() {
@@ -74,7 +73,7 @@ export function TransactionsTable() {
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="font-mono text-primary">303171622</span>
+              <span className="font-mono text-blue-500">303171622</span>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -110,7 +109,7 @@ export function TransactionsTable() {
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/txs/${tx.signature}`}
-                        className="font-mono text-primary hover:underline"
+                        className="font-mono text-blue-500 hover:underline"
                       >
                         {tx.signature.substring(0, 10)}...
                       </Link>
@@ -122,7 +121,7 @@ export function TransactionsTable() {
                   <TableCell>
                     <Link
                       href={`/blocks/${tx.block}`}
-                      className="font-mono text-primary hover:underline"
+                      className="font-mono ext-blue-500 hover:underline"
                     >
                       {tx.block}
                     </Link>
@@ -140,7 +139,7 @@ export function TransactionsTable() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-primary">{tx.by}</span>
+                      <span className="font-mono text-blue-500">{tx.by}</span>
                       <Button variant="ghost" size="icon" className="h-4 w-4">
                         <Copy className="h-3 w-3" />
                       </Button>
@@ -157,7 +156,7 @@ export function TransactionsTable() {
                       {tx.programs.map((program, index) => (
                         <Tooltip key={index}>
                           <TooltipTrigger asChild>
-                            <div className="h-4 w-4 rounded bg-primary/20" />
+                            <div className="h-4 w-4 rounded bg-blue-500/20" />
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">{program}</p>

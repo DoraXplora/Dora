@@ -48,7 +48,6 @@ const blocks = [
     successRate: '89.65%',
     reward: '0.03641',
   },
-  // Add more blocks as needed
 ];
 
 export function BlocksTable() {
@@ -79,7 +78,7 @@ export function BlocksTable() {
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/block/${block.hash}`}
-                        className="font-mono text-primary hover:underline"
+                        className="font-mono text-blue-500 hover:underline"
                       >
                         {block.hash}
                       </Link>
@@ -91,7 +90,7 @@ export function BlocksTable() {
                   <TableCell>
                     <Link
                       href={`/block/${block.slot}`}
-                      className="font-mono text-primary hover:underline"
+                      className="font-mono text-blue-500 hover:underline"
                     >
                       {block.slot}
                     </Link>
@@ -101,7 +100,7 @@ export function BlocksTable() {
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/validator/${block.leader}`}
-                        className="text-primary hover:underline"
+                        className="text-blue-500 hover:underline"
                       >
                         {block.leader}
                       </Link>

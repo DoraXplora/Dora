@@ -1,6 +1,11 @@
 'use client';
 
-import Image from 'next/image';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/src/components/ui/card';
 import {
   Table,
   TableBody,
@@ -9,31 +14,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/components/ui/table';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/src/components/ui/card';
+import Image from 'next/image';
 
 const collections = [
   {
     name: 'Mad Lads',
-    image: '/placeholder.svg?height=32&width=32',
+    image: '/placeholder.svg',
     items: '9,998',
     floorPrice: '31.58',
     vol24h: '31,647.88',
   },
   {
     name: 'Starship Goonies',
-    image: '/placeholder.svg?height=32&width=32',
+    image: '/placeholder.svg',
     items: '4,653',
     floorPrice: '20.48',
     vol24h: '24,722.6',
   },
   {
     name: 'Famous Fox Federation',
-    image: '/placeholder.svg?height=32&width=32',
+    image: '/placeholder.svg',
     items: '3,557',
     floorPrice: '23.841',
     vol24h: '20,376.88',

@@ -11,7 +11,7 @@ export function StatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* SOL Supply Card */}
-      <Card className="dark:!bg-[#241633]">
+      <Card>
         <CardHeader>
           <CardTitle>SOL Supply</CardTitle>
           <CardDescription>588,781,209.16</CardDescription>
@@ -37,7 +37,7 @@ export function StatsCards() {
       </Card>
 
       {/* Current Epoch Card */}
-      <Card className="dark:!bg-[#241633]">
+      <Card>
         <CardHeader>
           <CardTitle>Current Epoch</CardTitle>
           <CardDescription>701</CardDescription>
@@ -57,7 +57,7 @@ export function StatsCards() {
       </Card>
 
       {/* Network Card */}
-      <Card className="dark:!bg-[#241633]">
+      <Card>
         <CardHeader>
           <CardTitle>Network (Transactions)</CardTitle>
           <CardDescription>340,202,425,152</CardDescription>
@@ -77,7 +77,7 @@ export function StatsCards() {
       </Card>
 
       {/* Total Stake Card */}
-      <Card className="dark:!bg-[#241633]">
+      <Card>
         <CardHeader>
           <CardTitle>Total Stake (SOL)</CardTitle>
           <CardDescription>386,000,318.55</CardDescription>

@@ -28,7 +28,9 @@ export function NetworkStats() {
             TPS | True TPS
           </CardTitle>
           <div className="flex gap-2">
-            <span className="rounded bg-primary px-2 py-1 text-xs">24H</span>
+            <span className="rounded bg-primary text-primary-foreground px-2 py-1 text-xs">
+              24H
+            </span>
             <span className="rounded bg-muted px-2 py-1 text-xs">7D</span>
             <span className="rounded bg-muted px-2 py-1 text-xs">1M</span>
           </div>
@@ -64,7 +66,9 @@ export function NetworkStats() {
             Average Ping Time (Network response time)
           </CardTitle>
           <div className="flex gap-2">
-            <span className="rounded bg-primary px-2 py-1 text-xs">24H</span>
+            <span className="rounded bg-primary text-primary-foreground px-2 py-1 text-xs">
+              24H
+            </span>
             <span className="rounded bg-muted px-2 py-1 text-xs">7D</span>
             <span className="rounded bg-muted px-2 py-1 text-xs">1M</span>
           </div>

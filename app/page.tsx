@@ -17,9 +17,9 @@ export default function Home() {
             <input
               type="text"
               placeholder="Search transactions, blocks, programs and tokens"
-              className="w-full rounded-lg bg-white/10 px-4 py-3 pl-12 text-white placeholder-white/70 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="w-full rounded-lg bg-muted px-4 py-3 pl-12 text-foreground placeholder-foreground/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/20"
             />
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/70" />
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/70" />
           </div>
         </div>
       </div>
