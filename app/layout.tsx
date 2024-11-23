@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Dora - SOON Blockchain Explorer',
   description: 'Explore the SOON blockchain with ease',
+  icons: {
+    icon: '/logo.svg',
+  },
 };
 
 export default function RootLayout({
