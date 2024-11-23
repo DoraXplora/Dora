@@ -23,10 +23,10 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 interface BlockDetailsProps {
-  blockNumber: string;
+  hash: string;
 }
 
-export function BlockDetails({ blockNumber }: BlockDetailsProps) {
+export function BlockDetails({ hash: blockNumber }: BlockDetailsProps) {
   const [excludeVoteProgram, setExcludeVoteProgram] = useState(true);
   const [selectedProgram, setSelectedProgram] = useState('all');
   const [itemsPerPage, setItemsPerPage] = useState('10');

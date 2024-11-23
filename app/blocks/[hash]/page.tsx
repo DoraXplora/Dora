@@ -1,29 +1,29 @@
+import { BlockDetails } from '@/src/components/complex/blocks/block-details';
 import { SearchHeader } from '@/src/components/complex/txs/search-header';
-import { TransactionDetails } from '@/src/components/complex/txs/transaction-details';
 import { Metadata } from 'next';
 
 interface PageProps {
-  signature: string;
+  hash: string;
 }
 
 export const metadata: Metadata = {
-  title: 'Dora | Transaction Details',
+  title: 'Dora | Block Details',
   description:
-    'View detailed information about a transaction on the SOON blockchain.',
+    'View detailed information about a block on the SOON blockchain.',
 };
 
-export default async function TransactionPage({
+export default async function BlockPage({
   params,
 }: {
   params: Promise<PageProps>;
 }) {
-  const signature = (await params).signature;
+  const hash = (await params).hash;
 
   return (
     <div className="min-h-screen bg-background">
       <SearchHeader />
       <main className="container mx-auto px-4 py-8">
-        <TransactionDetails signature={signature} />
+        <BlockDetails hash={hash} />
       </main>
     </div>
   );

@@ -27,10 +27,10 @@ import { TooltipProvider } from '@/src/components/ui/tooltip';
 import { Copy, ExternalLink } from 'lucide-react';
 
 interface TransactionDetailsProps {
-  id: string;
+  signature: string;
 }
 
-export function TransactionDetails({ id }: TransactionDetailsProps) {
+export function TransactionDetails({ signature: id }: TransactionDetailsProps) {
   return (
     <TooltipProvider>
       <div className="space-y-6">
@@ -49,9 +49,7 @@ export function TransactionDetails({ id }: TransactionDetailsProps) {
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-1">
                 <div className="text-sm text-muted-foreground">Signature</div>
-                <div className="font-mono text-sm">
-                  {id}
-                </div>
+                <div className="font-mono text-sm">{id}</div>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="icon">
