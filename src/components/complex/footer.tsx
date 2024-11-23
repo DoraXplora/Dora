@@ -6,7 +6,7 @@ export function Footer() {
           <span>
             Powered by{' '}
             <a
-              className="text-[#9F1B30]"
+              className="text-[#9F1B30] hover:text-[#D11F2F] hover:text-underline"
               href="https://soo.network"
               target="_blank"
             >
