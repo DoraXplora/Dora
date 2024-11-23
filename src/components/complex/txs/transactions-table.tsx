@@ -59,7 +59,7 @@ const transactions = [
 ];
 
 export function TransactionsTable() {
-  const [currentPage, setCurrentPage] = useState(21);
+  const [currentPage] = useState(21);
   const [itemsPerPage, setItemsPerPage] = useState('20');
   const [excludeVoteProgram, setExcludeVoteProgram] = useState(true);
 

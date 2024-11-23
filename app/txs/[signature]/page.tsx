@@ -1,7 +1,6 @@
-import { Metadata } from 'next';
-import { TransactionDetails } from '@/src/components/complex/txs/transaction-details';
-import { Navbar } from '@/src/components/complex/navbar';
 import { SearchHeader } from '@/src/components/complex/txs/search-header';
+import { TransactionDetails } from '@/src/components/complex/txs/transaction-details';
+import { Metadata } from 'next';
 
 interface PageProps {
   params: {

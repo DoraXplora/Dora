@@ -50,7 +50,7 @@ export function TransactionDetails({ id }: TransactionDetailsProps) {
               <div className="space-y-1">
                 <div className="text-sm text-muted-foreground">Signature</div>
                 <div className="font-mono text-sm">
-                  sFgLHaTZzRQcsUoNCRbueBlgasUocBk4cXvbKT4JySzBLPMAMdM8uM1DjTUwMHDyZoSH79WJi8B34s7QdHBKuHj
+                  {id}
                 </div>
               </div>
               <div className="flex items-center gap-2">

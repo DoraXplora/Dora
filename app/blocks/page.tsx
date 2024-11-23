@@ -1,5 +1,4 @@
 import { BlocksTable } from '@/src/components/complex/blocks/blocks-table';
-import { Navbar } from '@/src/components/complex/navbar';
 import { SearchHeader } from '@/src/components/complex/txs/search-header';
 
 export default function BlocksPage() {

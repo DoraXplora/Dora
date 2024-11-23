@@ -51,7 +51,7 @@ const blocks = [
 ];
 
 export function BlocksTable() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState('20');
 
   return (
@@ -77,7 +77,7 @@ export function BlocksTable() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/block/${block.hash}`}
+                        href={`/blocks/${block.hash}`}
                         className="font-mono text-blue-500 hover:underline"
                       >
                         {block.hash}
@@ -89,7 +89,7 @@ export function BlocksTable() {
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/block/${block.slot}`}
+                      href={`/blocks/${block.slot}`}
                       className="font-mono text-blue-500 hover:underline"
                     >
                       {block.slot}

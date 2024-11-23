@@ -1,5 +1,4 @@
 import { BlockDetails } from '@/src/components/complex/blocks/block-details';
-import { Navbar } from '@/src/components/complex/navbar';
 import { SearchHeader } from '@/src/components/complex/txs/search-header';
 
 interface PageProps {
