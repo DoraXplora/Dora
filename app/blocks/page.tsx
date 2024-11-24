@@ -1,5 +1,5 @@
-import { BlocksTable } from '@/src/components/complex/blocks/blocks-table';
-import { SearchHeader } from '@/src/components/complex/txs/search-header';
+import { BlocksTable } from '@/src/components/complex/blocks/BlocksTable';
+import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
 
 export default function BlocksPage() {
   return (

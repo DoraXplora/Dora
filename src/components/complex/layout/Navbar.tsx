@@ -14,6 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/src/components/ui/sheet';
 import Image from 'next/image';
 import { useState } from 'react';
+import { ClusterModal } from './ClusterModal';
 
 const navItems = [
   { name: 'Transactions', href: '/txs' },
@@ -28,7 +29,7 @@ export function Navbar() {
 
   return (
     <nav className="flex justify-center h-16 sticky top-0 z-50 w-full border-b bg-background">
-      <div className="flex container">
+      <div className="flex max-sm:px-5 container">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Image src="/logo.svg" alt="Dora Logo" width={100} height={60} />
         </Link>
@@ -92,9 +93,13 @@ export function Navbar() {
                     {item.name}
                   </Link>
                 ))}
+                <ClusterModal />
               </nav>
             </SheetContent>
           </Sheet>
+        </div>
+        <div className="hidden md:flex items-center">
+          <ClusterModal />
         </div>
       </div>
     </nav>

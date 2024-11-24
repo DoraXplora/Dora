@@ -1,5 +1,5 @@
-import { SearchHeader } from '@/src/components/complex/txs/search-header';
-import { TransactionDetails } from '@/src/components/complex/txs/transaction-details';
+import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
+import { TransactionDetails } from '@/src/components/complex/txs/TransactionDetails';
 import { Metadata } from 'next';
 
 interface PageProps {

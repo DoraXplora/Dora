@@ -1,5 +1,5 @@
-import { BlockDetails } from '@/src/components/complex/blocks/block-details';
-import { SearchHeader } from '@/src/components/complex/txs/search-header';
+import { BlockDetails } from '@/src/components/complex/blocks/BlockDetails';
+import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
 import { Metadata } from 'next';
 
 interface PageProps {

@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/ui/tooltip';
-import { formatRelativeTime } from '@/src/lib/utils';
+import { formatRelativeTime } from '@/src/utils/date';
 import {
   ChevronLeft,
   ChevronRight,
@@ -65,7 +65,7 @@ export function TransactionsTable() {
 
   return (
     <TooltipProvider>
-      <div className="space-y-4">
+      <div className="overflow-x-auto space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm">Block:</span>

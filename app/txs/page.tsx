@@ -1,5 +1,5 @@
-import { SearchHeader } from '@/src/components/complex/txs/search-header';
-import { TransactionsTable } from '@/src/components/complex/txs/transactions-table';
+import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
+import { TransactionsTable } from '@/src/components/complex/txs/TransactionTable';
 
 export default function TransactionsPage() {
   return (

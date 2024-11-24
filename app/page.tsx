@@ -1,13 +1,27 @@
+'use client';
+
 import { Search } from 'lucide-react';
 // import { TopMarkets } from '@/src/components/complex/top-markets';
-import { StatsCards } from '@/src/components/base/stats-cards';
-import { DefiDashboard } from '@/src/components/complex/home/defi-dashboard';
-import { DefiProtocols } from '@/src/components/complex/home/defi-protocols';
-import { NetworkStats } from '@/src/components/complex/home/network-stats';
-import { NFTDashboard } from '@/src/components/complex/home/nft-dashboard';
-import { TransactionsTable } from '@/src/components/complex/txs/transactions-table';
+import { StatsCards } from '@/src/components/complex/home/StatsCards';
+import { DefiDashboard } from '@/src/components/complex/home/DefiDashboard';
+import { DefiProtocols } from '@/src/components/complex/home/DefiProtocols';
+import { NetworkStats } from '@/src/components/complex/home/NetworkStats';
+import { NFTDashboard } from '@/src/components/complex/home/NftDashboard';
+import { TransactionsTable } from '@/src/components/complex/txs/TransactionTable';
+import { StatsProvider } from '@/src/providers/stats';
+import { SupplyProvider } from '@/src/providers/supply';
 
-export default function Home() {
+export default function HomePage() {
+  return (
+    <StatsProvider>
+      <SupplyProvider>
+        <HomeContent />
+      </SupplyProvider>
+    </StatsProvider>
+  );
+}
+
+function HomeContent() {
   return (
     <div className="min-h-screen bg-background">
       <div className="relative">
@@ -25,7 +39,7 @@ export default function Home() {
       </div>
 
       <main className="container mx-auto px-4 py-8">
-        {/* <TopMarkets /> */}
+        {/* TODO: <TopMarkets /> */}
         <StatsCards />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
