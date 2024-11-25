@@ -58,7 +58,7 @@ function CustomTpsTooltip({
     const trueTpsPercentage = (payload.trueTps / payload.tps) * 100;
 
     return (
-      <div className="bg-background border-border rounded-lg p-3 shadow-lg w-max text-sm">
+      <div className="bg-background border-border rounded-lg p-3 shadow-lg max-w-sm text-sm">
         <div className="text-gray-600 mb-1">
           {displayTimestamp(payload.fullDate.getTime())}
         </div>

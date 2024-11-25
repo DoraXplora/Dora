@@ -68,8 +68,8 @@ export function TransactionsTable() {
       <div className="overflow-x-auto space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm">Block:</span>
-            <div className="flex items-center gap-1">
+            <span className="text-sm">Recent Transactions</span>
+            <div className="flex items-center text-sm">
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
