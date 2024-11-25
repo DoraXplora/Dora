@@ -3,7 +3,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card';
@@ -30,20 +29,29 @@ export default function CurrentEpochCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Epoch Progress</CardTitle>
-        <CardDescription className="flex items-center gap-2">
-          <Progress
-            className="h-2 bg-primary-foreground"
-            value={Number(epochProgress)}
-          />
-          <span className="text-xs">{epochProgress}%</span>
-        </CardDescription>
+        <CardTitle>
+          <div className="flex items-center justify-between">
+            <p className="w-full text-base">Current Epoch</p>
+            <Progress
+              className="h-2 bg-primary-foreground"
+              value={Number(epochProgress)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-blue-500">{epoch}</p>
+            <span className="font-normal text-slate-500 text-sm">
+              ({epochProgress}%)
+            </span>
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid p-3 gap-y-5 rounded-md bg-accent text-sm">
           <div>
-            <p className="flex-1 mb-1 opacity-70 text-xs">Current Epoch</p>
-            <p>{epoch}</p>
+            <p className="flex-1 mb-1 opacity-70 text-xs">Slot Range</p>
+            <p>
+              {slotIndex} to {slotsInEpoch}
+            </p>
           </div>
           <Separator className="bg-slate-200 dark:bg-slate-500" />
           <div>

@@ -1,15 +1,20 @@
 'use client';
 
 import { Search } from 'lucide-react';
+import dynamic from 'next/dynamic';
 // import { TopMarkets } from '@/src/components/complex/top-markets';
 import { StatsCards } from '@/src/components/complex/home/StatsCards';
 import { DefiDashboard } from '@/src/components/complex/home/DefiDashboard';
 import { DefiProtocols } from '@/src/components/complex/home/DefiProtocols';
-import { NetworkStats } from '@/src/components/complex/home/NetworkStats';
 import { NFTDashboard } from '@/src/components/complex/home/NftDashboard';
 import { TransactionsTable } from '@/src/components/complex/txs/TransactionTable';
 import { StatsProvider } from '@/src/providers/stats';
 import { SupplyProvider } from '@/src/providers/supply';
+
+const NetworkStats = dynamic(
+  () => import('@/src/components/complex/home/NetworkStats'),
+  { ssr: false }
+);
 
 export default function HomePage() {
   return (

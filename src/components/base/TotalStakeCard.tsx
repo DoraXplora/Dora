@@ -64,10 +64,10 @@ export default function TotalStakeCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Total Stake (SOL)</CardTitle>
-        <CardDescription>
-          {activeStake ? displayLamports(activeStake) : 0}
-        </CardDescription>
+        <CardTitle>
+          <p className="text-base opacity-70">Total Stake (SOL)</p>
+          <p>{activeStake ? displayLamports(activeStake) : 0}</p>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid p-3 gap-y-5 rounded-md bg-accent text-sm">

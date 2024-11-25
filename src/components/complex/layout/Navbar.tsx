@@ -29,7 +29,7 @@ export function Navbar() {
 
   return (
     <nav className="flex justify-center h-16 sticky top-0 z-50 w-full border-b bg-background">
-      <div className="flex max-sm:px-5 container">
+      <div className="flex px-4 container">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Image src="/logo.svg" alt="Dora Logo" width={100} height={60} />
         </Link>

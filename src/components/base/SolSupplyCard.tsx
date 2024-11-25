@@ -3,7 +3,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card';
@@ -52,10 +51,17 @@ export default function SolSupplyCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>SOL Supply</CardTitle>
-        <CardDescription>
-          {typeof supply === 'object' ? displayLamports(supply.total) : null}
-        </CardDescription>
+        <CardTitle>
+          <CardTitle>
+            <p className="text-base opacity-70">SOL Supply</p>
+            <p>
+              {' '}
+              {typeof supply === 'object'
+                ? displayLamports(supply.total)
+                : null}
+            </p>
+          </CardTitle>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid p-3 gap-y-5 rounded-md bg-accent text-sm">

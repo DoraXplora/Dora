@@ -36,7 +36,7 @@ const formatTime = (date: Date) => {
 
 type Series = 'short' | 'medium' | 'long';
 
-export function NetworkStats() {
+export default function NetworkStats() {
   const [tpsDuration, setTPSDuration] = useState<Series>('short');
   const [pingDuration, setPingDuration] = useState<Series>('short');
 
@@ -58,7 +58,7 @@ export function NetworkStats() {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between gap-x-2 space-y-0 pb-2">
           <CardTitle className="text-base font-normal">
             TPS | True TPS
           </CardTitle>
@@ -83,6 +83,7 @@ export function NetworkStats() {
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={tpsData}>
+                {/* TODO: Add a custom tooltip */}
                 <XAxis
                   dataKey="time"
                   stroke="#888888"
@@ -105,7 +106,7 @@ export function NetworkStats() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between gap-x-2 space-y-0 pb-2">
           <CardTitle className="text-base font-normal">
             Average Ping Time (Network response time)
           </CardTitle>

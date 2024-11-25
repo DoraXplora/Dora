@@ -20,8 +20,10 @@ export default function NetworkCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Transactions</CardTitle>
-        <CardDescription>{performanceInfo.transactionCount}</CardDescription>
+        <CardTitle>
+          <p className="text-base opacity-70">Transactions</p>
+          <p>{performanceInfo.transactionCount}</p>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid p-3 gap-y-5 rounded-md bg-accent text-sm">
