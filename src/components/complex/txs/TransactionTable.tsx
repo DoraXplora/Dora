@@ -1,49 +1,41 @@
 'use client';
 
 import { Badge } from '@/src/components/ui/badge';
-import { Button } from '@/src/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/src/components/ui/select';
+import { Button, buttonVariants } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/components/ui/table';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/ui/tooltip';
-import { formatRelativeTime } from '@/src/utils/date';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Copy,
-} from 'lucide-react';
+import { displayTimestampUtc, formatRelativeTime } from '@/src/utils/date';
+import { DataTable, DataTableColumnHeader } from '@components/ui/data-table';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowRight, ChevronLeft, ChevronRight, Copy, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-const transactions = [
+type Transaction = {
+  signature: string;
+  block: number;
+  time: Date;
+  instruction: { type: string; count: string };
+  by: string;
+  value: number;
+  fee: number;
+  programs: string[];
+};
+
+const transactions: Transaction[] = [
   {
     signature: 'oQPnhXAbLbMuKHESaGrbXT17CyvWCpLyERSJA9HCYd8',
     block: 303171622,
     time: new Date(Date.now() - 30 * 1000),
     instruction: { type: 'swap', count: '2+' },
-    by: '7dGcLiRYta...sELwYpuuMu',
-    value: '0.00005743',
-    fee: '0.00005743',
+    by: 'oQPnhXAbLbMuKHESaGrbXT17CyvWCpLyERSJA9HCYd8',
+    value: 0.00005743,
+    fee: 0.00005743,
     programs: ['system', 'token', 'compute'],
   },
   {
@@ -51,16 +43,181 @@ const transactions = [
     block: 303171622,
     time: new Date(Date.now() - 36 * 1000),
     instruction: { type: 'placeTradeOrder', count: '' },
-    by: 'MEV-Bot-7kmm...jnG',
-    value: '0.000055',
-    fee: '0.000055',
+    by: 'oQPnhXAbLbMuKHESaGrbXT17CyvWCpLyERSJA9HCYd8',
+    value: 0.000055,
+    fee: 0.000055,
     programs: ['raydium'],
   },
 ];
 
+const columns: ColumnDef<Transaction>[] = [
+  // SelectColumn<Block>({
+  //   id: 'select',
+  // }),
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const selectedItem = row.original;
+
+      return (
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">View more info</span>
+              <Eye className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>More Info</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+    },
+  },
+  {
+    accessorKey: 'signature',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Signature" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1">
+        <Link
+          href={`/txs/${row.getValue('signature')}`}
+          className="font-mono text-blue-500 hover:underline"
+        >
+          {(row.getValue('signature') as string).substring(0, 10)}...
+        </Link>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="ghost" size="icon" className="h-4 w-4">
+              <Copy
+                className="h-3 w-3"
+                onClick={() =>
+                  navigator.clipboard.writeText(row.getValue('signature'))
+                }
+              />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Copy to clipboard</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'block',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Block" />
+    ),
+    cell: ({ row }) => (
+      <Link
+        href={`/blocks/${row.getValue('block')}`}
+        className="font-mono text-blue-500 hover:underline"
+      >
+        {row.getValue('block')}
+      </Link>
+    ),
+  },
+  {
+    accessorKey: 'time',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Time" />
+    ),
+    cell: ({ row }) => (
+      <Tooltip>
+        <TooltipTrigger>
+          <p className="w-max">{formatRelativeTime(row.getValue('time'))}</p>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{displayTimestampUtc((row.getValue('time') as Date).getTime())}</p>
+        </TooltipContent>
+      </Tooltip>
+    ),
+  },
+  {
+    accessorKey: 'instruction',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tx Count" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Badge variant="outline">{row.original.instruction.type}</Badge>
+        {row.original.instruction.count && (
+          <Badge variant="secondary">{row.original.instruction.count}</Badge>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'by',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="By" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1">
+        <Link
+          href={`/address/${row.getValue('by')}`}
+          className="font-mono text-blue-500 hover:underline"
+        >
+          {(row.getValue('by') as string).substring(0, 4)}...
+          {(row.getValue('by') as string).substring(
+            (row.getValue('by') as string).length - 4
+          )}
+        </Link>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="ghost" size="icon" className="h-4 w-4">
+              <Copy
+                className="h-3 w-3"
+                onClick={() =>
+                  navigator.clipboard.writeText(row.getValue('by'))
+                }
+              />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Copy to clipboard</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'value',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Value" />
+    ),
+  },
+  {
+    accessorKey: 'fee',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Fee" />
+    ),
+  },
+  {
+    accessorKey: 'programs',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Programs" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1">
+        {row.original.programs.map((program, index) => (
+          <Tooltip key={index}>
+            <TooltipTrigger asChild>
+              <div className="h-4 w-4 rounded bg-blue-500/20" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs">{program}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+    ),
+  },
+];
+
 export function TransactionsTable() {
-  const [currentPage] = useState(21);
-  const [itemsPerPage, setItemsPerPage] = useState('20');
   const [excludeVoteProgram, setExcludeVoteProgram] = useState(true);
 
   return (
@@ -88,121 +245,25 @@ export function TransactionsTable() {
           </div>
         </div>
 
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Signature</TableHead>
-                <TableHead>Block</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Instructions</TableHead>
-                <TableHead>By</TableHead>
-                <TableHead className="text-right">Value (SOL)</TableHead>
-                <TableHead className="text-right">Fee (SOL)</TableHead>
-                <TableHead>Programs</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((tx) => (
-                <TableRow key={tx.signature}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/txs/${tx.signature}`}
-                        className="font-mono text-blue-500 hover:underline"
-                      >
-                        {tx.signature.substring(0, 10)}...
-                      </Link>
-                      <Button variant="ghost" size="icon" className="h-4 w-4">
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/blocks/${tx.block}`}
-                      className="font-mono ext-blue-500 hover:underline"
-                    >
-                      {tx.block}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{formatRelativeTime(tx.time)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{tx.instruction.type}</Badge>
-                      {tx.instruction.count && (
-                        <Badge variant="secondary">
-                          {tx.instruction.count}
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-blue-500">{tx.by}</span>
-                      <Button variant="ghost" size="icon" className="h-4 w-4">
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {tx.value}
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {tx.fee}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      {tx.programs.map((program, index) => (
-                        <Tooltip key={index}>
-                          <TooltipTrigger asChild>
-                            <div className="h-4 w-4 rounded bg-blue-500/20" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="text-xs">{program}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Show</span>
-            <Select value={itemsPerPage} onValueChange={setItemsPerPage}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="text-sm">per page</span>
+        <div className="rounded-lg border pt-2">
+          <div className="overflow-x-auto">
+            <DataTable
+              data={transactions}
+              columns={columns}
+              selectable={false}
+            />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon">
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm">Page {currentPage} of 21</span>
-            <Button variant="outline" size="icon">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <Link
+            className={
+              buttonVariants({ variant: 'secondary' }) +
+              ' flex !gap-1 items-center text-xs w-full !text-slate-500'
+            }
+            href="/txs"
+          >
+            VIEW ALL TRANSACTIONS
+            <ArrowRight height={2} width={2} />
+          </Link>
         </div>
       </div>
     </TooltipProvider>
