@@ -2,6 +2,13 @@
 
 import { Badge } from '@/src/components/ui/badge';
 import { Button, buttonVariants } from '@/src/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select';
 import { Switch } from '@/src/components/ui/switch';
 import {
   Tooltip,
@@ -218,6 +225,7 @@ const columns: ColumnDef<Transaction>[] = [
 ];
 
 export function TransactionsTable() {
+  const [selectedProgram, setSelectedProgram] = useState('all');
   const [excludeVoteProgram, setExcludeVoteProgram] = useState(true);
 
   return (
@@ -243,6 +251,16 @@ export function TransactionsTable() {
               onCheckedChange={setExcludeVoteProgram}
             />
           </div>
+          <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select program" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Programs</SelectItem>
+              <SelectItem value="system">System Program</SelectItem>
+              <SelectItem value="token">Token Program</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="rounded-lg border pt-2">

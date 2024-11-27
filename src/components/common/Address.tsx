@@ -1,17 +1,20 @@
 'use client';
 
-import { Connection, programs } from '@metaplex/js';
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { useCluster } from '@providers/cluster';
-import { PublicKey } from '@solana/web3.js';
 import { displayAddress, TokenLabelInfo } from '@utils/tx';
 import { useClusterPath } from '@utils/url';
 import Link from 'next/link';
 import { useState } from 'react';
 import useAsyncEffect from 'use-async-effect';
 
-import { getTokenInfoWithoutOnChainFallback } from '@utils/token-info';
+// import { getTokenInfoWithoutOnChainFallback } from '@utils/token-info';
 
-import { Copyable } from './Copyable.jsx';
+import { pubkeyToString } from '@/src/utils';
+import { fetchToken, Token } from '@metaplex-foundation/mpl-toolbox';
+import { publicKey } from '@metaplex-foundation/umi';
+import { PublicKey } from '@solana/web3.js';
+import { Copyable } from './Copyable';
 
 type Props = {
   pubkey: PublicKey;
@@ -53,7 +56,7 @@ export function Address({
 
   const metaplexData = useTokenMetadata(useMetadata, address);
   if (metaplexData && metaplexData.data) {
-    addressLabel = metaplexData.data.name;
+    addressLabel = pubkeyToString(metaplexData.data.publicKey);
   }
 
   const tokenInfo = useTokenInfo(fetchTokenLabelInfo, address);
@@ -102,7 +105,7 @@ export function Address({
   );
 }
 const useTokenMetadata = (useMetadata: boolean | undefined, pubkey: string) => {
-  const [data, setData] = useState<programs.metadata.Data>();
+  const [data, setData] = useState<Token>();
   const { url } = useCluster();
 
   useAsyncEffect(
@@ -110,13 +113,11 @@ const useTokenMetadata = (useMetadata: boolean | undefined, pubkey: string) => {
       if (!useMetadata) return;
       if (pubkey && !data) {
         try {
-          const connection = new Connection(url);
-          const metadata = await programs.metadata.Metadata.fromAccountAddress(
-            connection,
-            new PublicKey(pubkey)
-          );
+          const umi = createUmi(url, { commitment: 'confirmed' });
+          const token = await fetchToken(umi, publicKey(pubkey));
+
           if (isMounted()) {
-            setData(metadata.data);
+            setData(token);
           }
         } catch {
           if (isMounted()) {
@@ -142,12 +143,11 @@ const useTokenInfo = (
       if (!fetchTokenLabelInfo) return;
       if (!info) {
         try {
-          const token = await getTokenInfoWithoutOnChainFallback(
-            new PublicKey(pubkey),
-            cluster
-          );
+          const umi = createUmi(url, { commitment: 'confirmed' });
+          const token = await fetchToken(umi, publicKey(pubkey));
+
           if (isMounted()) {
-            setInfo(token);
+            setInfo({ name: 'Placeholder', symbol: 'PS' });
           }
         } catch {
           if (isMounted()) {

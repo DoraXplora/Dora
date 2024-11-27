@@ -24,13 +24,114 @@ import {
   TabsTrigger,
 } from '@/src/components/ui/tabs';
 import { TooltipProvider } from '@/src/components/ui/tooltip';
+import { FetchStatus } from '@/src/providers/cache';
+import { useCluster } from '@/src/providers/cluster';
+import {
+  useFetchTransactionStatus,
+  useTransactionDetails,
+  useTransactionStatus,
+} from '@/src/providers/transactions';
+import { ClusterStatus } from '@/src/utils/cluster';
+import { useClusterPath } from '@/src/utils/url';
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes';
+import { TransactionSignature } from '@solana/web3.js';
 import { Copy, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import useTabVisibility from 'use-tab-visibility';
+
+const AUTO_REFRESH_INTERVAL = 2000;
+const ZERO_CONFIRMATION_BAILOUT = 5;
+
+enum AutoRefresh {
+  Active,
+  Inactive,
+  BailedOut,
+}
 
 interface TransactionDetailsProps {
   signature: string;
 }
 
-export function TransactionDetails({ signature: id }: TransactionDetailsProps) {
+export function TransactionDetails({
+  signature: rawSignature,
+}: TransactionDetailsProps) {
+  let signature: TransactionSignature | undefined;
+
+  try {
+    const decoded = bs58.decode(rawSignature);
+    if (decoded.length === 64) {
+      signature = rawSignature;
+    }
+  } catch (err) {
+    /* empty */
+  }
+
+  const status = useTransactionStatus(signature);
+  const [zeroConfirmationRetries, setZeroConfirmationRetries] = useState(0);
+  const { visible: isTabVisible } = useTabVisibility();
+
+  let autoRefresh = AutoRefresh.Inactive;
+  if (!isTabVisible) {
+    autoRefresh = AutoRefresh.Inactive;
+  } else if (zeroConfirmationRetries >= ZERO_CONFIRMATION_BAILOUT) {
+    autoRefresh = AutoRefresh.BailedOut;
+  } else if (status?.data?.info && status.data.info.confirmations !== 'max') {
+    autoRefresh = AutoRefresh.Active;
+  }
+
+  useEffect(() => {
+    if (
+      status?.status === FetchStatus.Fetched &&
+      status.data?.info &&
+      status.data.info.confirmations === 0
+    ) {
+      setZeroConfirmationRetries((retries) => retries + 1);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (
+      status?.status === FetchStatus.Fetching &&
+      autoRefresh === AutoRefresh.BailedOut
+    ) {
+      setZeroConfirmationRetries(0);
+    }
+  }, [status, autoRefresh, setZeroConfirmationRetries]);
+
+  const fetchStatus = useFetchTransactionStatus();
+  const details = useTransactionDetails(signature);
+  const {
+    cluster,
+    clusterInfo,
+    name: clusterName,
+    status: clusterStatus,
+    url: clusterUrl,
+  } = useCluster();
+  const inspectPath = useClusterPath({
+    pathname: `/txs/${signature}/inspect`,
+  });
+
+  // Fetch transaction on load
+  useEffect(() => {
+    if (!status && clusterStatus === ClusterStatus.Connected) {
+      fetchStatus(signature);
+    }
+  }, [signature, clusterStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Effect to set and clear interval for auto-refresh
+  useEffect(() => {
+    if (autoRefresh === AutoRefresh.Active) {
+      const intervalHandle: NodeJS.Timeout = setInterval(
+        () => fetchStatus(signature),
+        AUTO_REFRESH_INTERVAL
+      );
+
+      return () => {
+        clearInterval(intervalHandle);
+      };
+    }
+  }, [autoRefresh, fetchStatus, signature]);
+
   return (
     <TooltipProvider>
       <div className="space-y-6">
@@ -49,7 +150,7 @@ export function TransactionDetails({ signature: id }: TransactionDetailsProps) {
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-1">
                 <div className="text-sm text-muted-foreground">Signature</div>
-                <div className="font-mono text-sm">{id}</div>
+                <div className="font-mono text-sm">{signature}</div>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="icon">

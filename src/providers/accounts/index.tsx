@@ -1,9 +1,6 @@
 'use client';
 
-import { MetadataJson, programs } from '@metaplex/js';
-import getEditionInfo, {
-  EditionInfo,
-} from '@providers/accounts/utils/getEditionInfo';
+// import getEditionInfo from '@providers/accounts/utils/getEditionInfo';
 import * as Cache from '@providers/cache';
 import { ActionType, FetchStatus } from '@providers/cache';
 import { useCluster } from '@providers/cluster';
@@ -17,7 +14,6 @@ import {
   SystemProgram,
 } from '@solana/web3.js';
 import { Cluster } from '@utils/cluster';
-import { pubkeyToString } from '@utils/index';
 import { assertIsTokenProgram, TokenProgram } from '@utils/programs';
 import { ParsedAddressLookupTableAccount } from '@validators/accounts/address-lookup-table';
 import { ConfigAccount } from '@validators/accounts/config';
@@ -45,8 +41,6 @@ import { TokensProvider } from './tokens';
 import { getStakeActivation } from './utils/stake';
 export { useAccountHistory } from './history';
 
-const Metadata = programs.metadata.Metadata;
-
 export type StakeProgramData = {
   program: 'stake';
   parsed: StakeAccount;
@@ -60,9 +54,9 @@ export type UpgradeableLoaderAccountData = {
 };
 
 export type NFTData = {
-  metadata: programs.metadata.Data;
-  json: MetadataJson | undefined;
-  editionInfo: EditionInfo;
+  metadata: any;
+  json: JSON | undefined;
+  editionInfo: any;
 };
 
 export function isTokenProgramData(data: {
@@ -416,39 +410,39 @@ async function handleParsedAccountData(
     }
 
     case 'spl-token':
-    case 'spl-token-2022': {
-      const parsed = create(info, TokenAccount);
-      let nftData;
+    // case 'spl-token-2022': {
+    //   const parsed = create(info, TokenAccount);
+    //   let nftData;
 
-      try {
-        // Generate a PDA and check for a Metadata Account
-        if (parsed.type === 'mint') {
-          const metadata = await Metadata.fromAccountAddress(
-            connection,
-            new PublicKey(accountKey)
-          );
-          if (metadata) {
-            // We have a valid Metadata account. Try and pull edition data.
-            const editionInfo = await getEditionInfo(metadata, connection);
-            const id = pubkeyToString(accountKey);
-            const metadataJSON = await getMetaDataJSON(id, metadata.data);
-            nftData = {
-              editionInfo,
-              json: metadataJSON,
-              metadata: metadata.data,
-            };
-          }
-        }
-      } catch (error) {
-        // unable to find NFT metadata account
-      }
+    //   try {
+    //     // Generate a PDA and check for a Metadata Account
+    //     if (parsed.type === 'mint') {
+    //       const metadata = await Metadata.fromAccountAddress(
+    //         connection,
+    //         new PublicKey(accountKey)
+    //       );
+    //       if (metadata) {
+    //         // We have a valid Metadata account. Try and pull edition data.
+    //         const editionInfo = await getEditionInfo(metadata, connection);
+    //         const id = pubkeyToString(accountKey);
+    //         const metadataJSON = await getMetaDataJSON(id, metadata.data);
+    //         nftData = {
+    //           editionInfo,
+    //           json: metadataJSON,
+    //           metadata: metadata.data,
+    //         };
+    //       }
+    //     }
+    //   } catch (error) {
+    //     // unable to find NFT metadata account
+    //   }
 
-      return {
-        nftData,
-        parsed,
-        program: accountData.program,
-      };
-    }
+    //   return {
+    //     nftData,
+    //     parsed,
+    //     program: accountData.program,
+    //   };
+    // }
   }
 }
 
@@ -456,8 +450,8 @@ const IMAGE_MIME_TYPE_REGEX = /data:image\/(svg\+xml|png|jpeg|gif)/g;
 
 const getMetaDataJSON = async (
   id: string,
-  metadata: programs.metadata.Data
-): Promise<MetadataJson | undefined> => {
+  metadata: any
+): Promise<JSON | undefined> => {
   return new Promise((resolve) => {
     const uri = metadata.uri;
     if (!uri) return resolve(undefined);

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { ReactNode, useState } from 'react';
 import { CheckCircle, Copy, XCircle } from 'lucide-react';
+import { ReactNode, useState } from 'react';
 
 type CopyState = 'copy' | 'copied' | 'errored';
 
@@ -29,18 +29,14 @@ export function Copyable({
   function CopyIcon() {
     if (state === 'copy') {
       return (
-        <Copy
-          className="align-text-top c-pointer"
-          onClick={handleClick}
-          size={13}
-        />
+        <Copy className="cursor-pointer" onClick={handleClick} size={13} />
       );
     } else if (state === 'copied') {
-      return <CheckCircle className="align-text-top" size={13} />;
+      return <CheckCircle size={13} />;
     } else if (state === 'errored') {
       return (
         <span title="Please check your browser's copy permissions.">
-          <XCircle className="align-text-top" size={13} />
+          <XCircle size={13} />
         </span>
       );
     }
@@ -57,48 +53,44 @@ export function Copyable({
     textColor = 'text-danger';
   }
 
-  function PrependCopyIcon() {
+  function AppendCopyIcon() {
     return (
-      <>
-        <span className="font-size-tiny me-2">
+      <span className="flex items-center gap-1">
+        {children}
+        <span className="text-xs me-2">
           <span className={textColor}>
             {message !== undefined && <span className="me-2">{message}</span>}
             <CopyIcon />
           </span>
         </span>
-        {children}
-      </>
+      </span>
     );
   }
 
   function ReplaceWithMessage() {
     return (
-      <span className="d-flex flex-column flex-nowrap">
-        <span className="font-size-tiny">
+      <span className="flex flex-nowrap">
+        <span className="text-xs">
           <span className={textColor}>
             <CopyIcon />
             <span className="ms-2">{message}</span>
           </span>
         </span>
-        <span className="v-hidden">{children}</span>
+        <span className="sr-only">{children}</span>
       </span>
     );
   }
 
   if (state === 'copy') {
-    return <PrependCopyIcon />;
+    return <AppendCopyIcon />;
   } else if (replaceText) {
     return <ReplaceWithMessage />;
   }
 
   return (
     <>
-      <span className="d-none d-lg-inline">
-        <PrependCopyIcon />
-      </span>
-      <span className="d-inline d-lg-none">
-        <ReplaceWithMessage />
-      </span>
+      <ReplaceWithMessage />
+      <AppendCopyIcon />
     </>
   );
 }

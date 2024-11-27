@@ -7,22 +7,22 @@ import { Cluster } from '@utils/cluster';
 import React from 'react';
 
 export enum FetchStatus {
-    Fetching,
-    FetchFailed,
-    Fetched,
+  Fetching,
+  FetchFailed,
+  Fetched,
 }
 
 export enum ActionType {
-    Update,
-    Clear,
+  Update,
+  Clear,
 }
 
-type Block = {
-    block?: VersionedBlockResponse;
-    blockLeader?: PublicKey;
-    childSlot?: number;
-    childLeader?: PublicKey;
-    parentLeader?: PublicKey;
+export type Block = {
+  block?: VersionedBlockResponse;
+  blockLeader?: PublicKey;
+  childSlot?: number;
+  childLeader?: PublicKey;
+  parentLeader?: PublicKey;
 };
 
 type State = Cache.State<Block>;
@@ -34,97 +34,112 @@ const DispatchContext = React.createContext<Dispatch | undefined>(undefined);
 type BlockProviderProps = { children: React.ReactNode };
 
 export function BlockProvider({ children }: BlockProviderProps) {
-    const { url } = useCluster();
-    const [state, dispatch] = Cache.useReducer<Block>(url);
+  const { url } = useCluster();
+  const [state, dispatch] = Cache.useReducer<Block>(url);
 
-    React.useEffect(() => {
-        dispatch({ type: ActionType.Clear, url });
-    }, [dispatch, url]);
+  React.useEffect(() => {
+    dispatch({ type: ActionType.Clear, url });
+  }, [dispatch, url]);
 
-    return (
-        <StateContext.Provider value={state}>
-            <DispatchContext.Provider value={dispatch}>{children}</DispatchContext.Provider>
-        </StateContext.Provider>
-    );
+  return (
+    <StateContext.Provider value={state}>
+      <DispatchContext.Provider value={dispatch}>
+        {children}
+      </DispatchContext.Provider>
+    </StateContext.Provider>
+  );
 }
 
 export function useBlock(key: number): Cache.CacheEntry<Block> | undefined {
-    const context = React.useContext(StateContext);
+  const context = React.useContext(StateContext);
 
-    if (!context) {
-        throw new Error(`useBlock must be used within a BlockProvider`);
-    }
+  if (!context) {
+    throw new Error(`useBlock must be used within a BlockProvider`);
+  }
 
-    return context.entries[key];
+  return context.entries[key];
 }
 
-export async function fetchBlock(dispatch: Dispatch, url: string, cluster: Cluster, slot: number) {
-    dispatch({
-        key: slot,
-        status: FetchStatus.Fetching,
-        type: ActionType.Update,
-        url,
+export async function fetchBlock(
+  dispatch: Dispatch,
+  url: string,
+  cluster: Cluster,
+  slot: number
+) {
+  dispatch({
+    key: slot,
+    status: FetchStatus.Fetching,
+    type: ActionType.Update,
+    url,
+  });
+
+  let status: FetchStatus;
+  let data: Block | undefined = undefined;
+
+  try {
+    const connection = new Connection(url, 'confirmed');
+    const block = await connection.getBlock(slot, {
+      maxSupportedTransactionVersion: 0,
     });
+    if (block === null) {
+      data = {};
+      status = FetchStatus.Fetched;
+    } else {
+      const childSlot = (
+        await connection.getBlocks(slot + 1, slot + 100)
+      ).shift();
+      const firstLeaderSlot = block.parentSlot;
 
-    let status: FetchStatus;
-    let data: Block | undefined = undefined;
+      let leaders: PublicKey[] = [];
+      try {
+        const lastLeaderSlot = childSlot !== undefined ? childSlot : slot;
+        const slotLeadersLimit = lastLeaderSlot - block.parentSlot + 1;
+        leaders = await connection.getSlotLeaders(
+          firstLeaderSlot,
+          slotLeadersLimit
+        );
+      } catch (err) {
+        // ignore errors
+      }
 
-    try {
-        const connection = new Connection(url, 'confirmed');
-        const block = await connection.getBlock(slot, {
-            maxSupportedTransactionVersion: 0,
-        });
-        if (block === null) {
-            data = {};
-            status = FetchStatus.Fetched;
-        } else {
-            const childSlot = (await connection.getBlocks(slot + 1, slot + 100)).shift();
-            const firstLeaderSlot = block.parentSlot;
+      const getLeader = (slot: number) => {
+        return leaders.at(slot - firstLeaderSlot);
+      };
 
-            let leaders: PublicKey[] = [];
-            try {
-                const lastLeaderSlot = childSlot !== undefined ? childSlot : slot;
-                const slotLeadersLimit = lastLeaderSlot - block.parentSlot + 1;
-                leaders = await connection.getSlotLeaders(firstLeaderSlot, slotLeadersLimit);
-            } catch (err) {
-                // ignore errors
-            }
-
-            const getLeader = (slot: number) => {
-                return leaders.at(slot - firstLeaderSlot);
-            };
-
-            data = {
-                block,
-                blockLeader: getLeader(slot),
-                childLeader: childSlot !== undefined ? getLeader(childSlot) : undefined,
-                childSlot,
-                parentLeader: getLeader(block.parentSlot),
-            };
-            status = FetchStatus.Fetched;
-        }
-    } catch (err) {
-        status = FetchStatus.FetchFailed;
-        if (cluster !== Cluster.Custom) {
-            console.error(err, { tags: { url } });
-        }
+      data = {
+        block,
+        blockLeader: getLeader(slot),
+        childLeader: childSlot !== undefined ? getLeader(childSlot) : undefined,
+        childSlot,
+        parentLeader: getLeader(block.parentSlot),
+      };
+      status = FetchStatus.Fetched;
     }
+  } catch (err) {
+    status = FetchStatus.FetchFailed;
+    if (cluster !== Cluster.Custom) {
+      console.error(err, { tags: { url } });
+    }
+  }
 
-    dispatch({
-        data,
-        key: slot,
-        status,
-        type: ActionType.Update,
-        url,
-    });
+  dispatch({
+    data,
+    key: slot,
+    status,
+    type: ActionType.Update,
+    url,
+  });
 }
 
 export function useFetchBlock() {
-    const dispatch = React.useContext(DispatchContext);
-    if (!dispatch) {
-        throw new Error(`useFetchBlock must be used within a BlockProvider`);
-    }
+  const dispatch = React.useContext(DispatchContext);
+  if (!dispatch) {
+    throw new Error(`useFetchBlock must be used within a BlockProvider`);
+  }
 
-    const { cluster, url } = useCluster();
-    return React.useCallback((key: number) => fetchBlock(dispatch, url, cluster, key), [dispatch, cluster, url]);
+  const { cluster, url } = useCluster();
+  return React.useCallback(
+    (key: number) => fetchBlock(dispatch, url, cluster, key),
+    [dispatch, cluster, url]
+  );
 }
