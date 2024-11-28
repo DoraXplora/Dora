@@ -99,7 +99,7 @@ export function TransactionDetails({
   }, [status, autoRefresh, setZeroConfirmationRetries]);
 
   const fetchStatus = useFetchTransactionStatus();
-  const details = useTransactionDetails(signature);
+  const details = useTransactionDetails(signature!);
   const {
     cluster,
     clusterInfo,
@@ -114,7 +114,7 @@ export function TransactionDetails({
   // Fetch transaction on load
   useEffect(() => {
     if (!status && clusterStatus === ClusterStatus.Connected) {
-      fetchStatus(signature);
+      fetchStatus(signature!);
     }
   }, [signature, clusterStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -122,7 +122,7 @@ export function TransactionDetails({
   useEffect(() => {
     if (autoRefresh === AutoRefresh.Active) {
       const intervalHandle: NodeJS.Timeout = setInterval(
-        () => fetchStatus(signature),
+        () => fetchStatus(signature!),
         AUTO_REFRESH_INTERVAL
       );
 

@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dora (DoraXplora) 🔍🚀
+
+## Overview
+
+Dora is an advanced, open-source blockchain explorer designed specifically for the SOON blockchain ecosystem. Built to provide deep, insightful analytics and seamless transaction tracking, Dora transforms complex blockchain data into intuitive, shareable insights.
+
+![Solana Explorer Screenshot](/placeholder.svg?height=400&width=800)
+
+## Features
+
+- 💹 **Comprehensive Transaction Tracking**
+- 📈 **Personalized Wallet Profiling And Analysis**
+- 📊 **Real-time Blockchain Analytics**
+- 🚀 **Interactive Visualization**
+
+## Tech Stack
+
+- [Next.js 14](https://nextjs.org/) - React framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Recharts](https://recharts.org/) - Charts and data visualization
+- [next-themes](https://github.com/pacocoursey/next-themes) - Theme management
+- **Analytics Engine:** Custom-built
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.17 or later
+- npm or pnpm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/solana-explorer.git
+cd solana-explorer
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn install
+```
+
+3. Create a `.env` file in the root directory and add your environment variables:
+
+```bash
+NEXT_PUBLIC_DEVNET_RPC_URL=
+NEXT_PUBLIC_TESTNET_RPC_URL=
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
 # or
-yarn dev
-# or
 pnpm dev
 # or
-bun dev
+yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Learn More
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Acknowledgments
 
-## Deploy on Vercel
+- [SOON](https://soo.network/) - SOON Network
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Vercel](https://vercel.com/) - Deployment platform
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For support, please open an issue in the GitHub repository or contact the maintainers.
