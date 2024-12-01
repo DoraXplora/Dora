@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, buttonVariants } from '@/src/components/ui/button';
+import { buttonVariants } from '@/src/components/ui/button';
 import { displayTimestampUtc, formatRelativeTime } from '@/src/utils/date';
 import { DataTable, DataTableColumnHeader } from '@components/ui/data-table';
 import { Switch } from '@components/ui/switch';
@@ -61,10 +61,10 @@ const columns: ColumnDef<Block>[] = [
       return (
         <Tooltip>
           <TooltipTrigger>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">View more info</span>
-              <Eye className="h-4 w-4" />
-            </Button>
+            {/* <Button variant="ghost" className="h-8 w-8 p-0"> */}
+            <span className="sr-only">View more info</span>
+            <Eye className="h-4 w-4" />
+            {/* </Button> */}
           </TooltipTrigger>
           <TooltipContent>
             <p>More Info</p>
@@ -87,15 +87,21 @@ const columns: ColumnDef<Block>[] = [
           {row.getValue('hash')}
         </Link>
         <Tooltip>
-          <TooltipTrigger>
-            <Button variant="ghost" size="icon" className="h-4 w-4">
-              <Copy
-                className="h-3 w-3"
-                onClick={() =>
-                  navigator.clipboard.writeText(row.getValue('hash'))
-                }
-              />
-            </Button>
+          <TooltipTrigger
+            className={buttonVariants({
+              variant: 'ghost',
+              size: 'icon',
+              className: 'h-4 w-4',
+            })}
+          >
+            {/* <Button variant="ghost" size="icon" className="h-4 w-4"> */}
+            <Copy
+              className="h-3 w-3"
+              onClick={() =>
+                navigator.clipboard.writeText(row.getValue('hash'))
+              }
+            />
+            {/* </Button> */}
           </TooltipTrigger>
           <TooltipContent>
             <p>Copy to clipboard</p>
@@ -148,15 +154,19 @@ const columns: ColumnDef<Block>[] = [
           {row.getValue('leader')}
         </Link>
         <Tooltip>
-          <TooltipTrigger>
-            <Button variant="ghost" size="icon" className="h-4 w-4">
-              <Copy
-                className="h-3 w-3"
-                onClick={() =>
-                  navigator.clipboard.writeText(row.getValue('leader'))
-                }
-              />
-            </Button>
+          <TooltipTrigger
+            className={buttonVariants({
+              variant: 'ghost',
+              size: 'icon',
+              className: 'h-4 w-4',
+            })}
+          >
+            <Copy
+              className="h-3 w-3"
+              onClick={() =>
+                navigator.clipboard.writeText(row.getValue('leader'))
+              }
+            />
           </TooltipTrigger>
           <TooltipContent>
             <p>Copy to clipboard</p>

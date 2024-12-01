@@ -31,7 +31,7 @@ export default function CurrentEpochCard() {
       <CardHeader>
         <CardTitle>
           <div className="flex items-center justify-between">
-            <p className="w-full text-base">Current Epoch</p>
+            <p className="w-full text-base opacity-70">Current Epoch</p>
             <Progress
               className="h-2 bg-primary-foreground"
               value={Number(epochProgress)}
