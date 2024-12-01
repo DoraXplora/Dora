@@ -3,15 +3,11 @@
 import { BlocksTable } from '@/src/components/complex/blocks/BlocksTable';
 import DashboardTransactionsTable from '@/src/components/complex/dashboard/DashboardTransactionsTable';
 import { StatsCards } from '@/src/components/complex/dashboard/StatsCards';
-import { BlockProvider, useBlock, useFetchBlock } from '@/src/providers/block';
-import { useCluster } from '@/src/providers/cluster';
+import { BlockProvider } from '@/src/providers/block';
 import { StatsProvider } from '@/src/providers/stats';
-import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
 import { SupplyProvider } from '@/src/providers/supply';
-import { ClusterStatus } from '@/src/utils/cluster';
 import { Search } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
 
 const NetworkStats = dynamic(
   () => import('@/src/components/complex/dashboard/NetworkStats'),
@@ -31,23 +27,6 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const dashboardInfo = useDashboardInfo();
-
-  const { epochInfo } = dashboardInfo;
-  const { blockHeight } = epochInfo;
-
-  const [blockNumber, setBlockNumber] = useState(Number(blockHeight));
-
-  const confirmedBlock = useBlock(Number(blockNumber));
-  const fetchBlock = useFetchBlock();
-  const { status } = useCluster();
-  // Fetch block on load
-  useEffect(() => {
-    if (!confirmedBlock && status === ClusterStatus.Connected) {
-      fetchBlock(Number(blockNumber));
-    }
-  }, [blockNumber, status]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <div className="min-h-screen bg-background">
       <div className="relative">

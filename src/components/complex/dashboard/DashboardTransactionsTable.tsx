@@ -4,7 +4,7 @@ import {
   TransactionsTable,
   type ProgramFilter,
 } from '@/src/components/complex/txs/TransactionsTable';
-import { Button } from '@/src/components/ui/button';
+import { Button, buttonVariants } from '@/src/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from '@/src/components/ui/select';
 import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function DashboardTransactionsTable() {
@@ -36,10 +37,11 @@ export default function DashboardTransactionsTable() {
               variant="ghost"
               size="icon"
               className="h-8 w-8"
+              disabled={blockNumber === 0}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="font-mono text-blue-500">{blockHeight}</span>
+            <span className="font-mono text-blue-500">{blockNumber}</span>
             <Button
               onClick={() => setBlockNumber(blockNumber + 1)}
               variant="ghost"
@@ -66,10 +68,24 @@ export default function DashboardTransactionsTable() {
         </Select>
       </div>
 
-      <TransactionsTable
-        programFilter={programFilter}
-        blockNumber={blockNumber}
-      />
+      <div className="rounded-lg border pt-2">
+        <TransactionsTable
+          programFilter={programFilter}
+          blockNumber={blockNumber}
+        />
+
+        <Link
+          className={buttonVariants({
+            variant: 'secondary',
+            className:
+              'flex !gap-1 items-center text-xs w-full !text-slate-500',
+          })}
+          href="/txs"
+        >
+          VIEW ALL TRANSACTIONS
+          <ArrowRight height={2} width={2} />
+        </Link>
+      </div>
     </div>
   );
 }

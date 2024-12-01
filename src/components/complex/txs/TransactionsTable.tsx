@@ -161,119 +161,106 @@ export function TransactionsTable({
 
   return (
     <TooltipProvider>
-      <div className="rounded-lg border pt-2">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => setSortMode('')}
-                >
-                  #
-                </TableHead>
-                <TableHead>Result</TableHead>
-                <TableHead>Transaction Signature</TableHead>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="cursor-pointer"
+                onClick={() => setSortMode('')}
+              >
+                #
+              </TableHead>
+              <TableHead>Result</TableHead>
+              <TableHead>Transaction Signature</TableHead>
+              <TableHead
+                className="text-right cursor-pointer"
+                onClick={() => setSortMode('fee')}
+              >
+                Fee
+              </TableHead>
+              {showComputeUnits && (
                 <TableHead
                   className="text-right cursor-pointer"
-                  onClick={() => setSortMode('fee')}
+                  onClick={() => setSortMode('compute')}
                 >
-                  Fee
+                  Compute
                 </TableHead>
-                {showComputeUnits && (
-                  <TableHead
-                    className="text-right cursor-pointer"
-                    onClick={() => setSortMode('compute')}
-                  >
-                    Compute
-                  </TableHead>
-                )}
-                <TableHead>Invoked Programs</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTransactions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <span className="block w-full text-center">
-                      {programFilter === 'hideVotes'
-                        ? "This block doesn't contain any non-vote transactions"
-                        : 'No transactions found'}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredTransactions.map((tx, i) => {
-                  const statusText =
-                    tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
-                  const statusVariant =
-                    tx.meta?.err || !tx.signature ? 'destructive' : 'success';
-
-                  return (
-                    <TableRow key={i}>
-                      <TableCell>{tx.index + 1}</TableCell>
-                      <TableCell>
-                        <Badge variant={statusVariant}>{statusText}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {tx.signature && (
-                          <Signature
-                            signature={tx.signature}
-                            link
-                            truncateChars={48}
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {tx.meta !== null ? (
-                          <SolBalance lamports={tx.meta.fee} />
-                        ) : (
-                          'Unknown'
-                        )}
-                      </TableCell>
-                      {showComputeUnits && (
-                        <TableCell className="text-right">
-                          {tx.logTruncated && '>'}
-                          {tx.computeUnits !== undefined
-                            ? new Intl.NumberFormat('en-US').format(
-                                tx.computeUnits
-                              )
-                            : 'Unknown'}
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        {tx.invocations.size === 0
-                          ? 'NA'
-                          : Array.from(tx.invocations.entries())
-                              .sort()
-                              .map(([programId, count], i) => (
-                                <div key={i} className="flex items-center">
-                                  <Address
-                                    pubkey={new PublicKey(programId)}
-                                    link
-                                  />
-                                  <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
-                                </div>
-                              ))}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
               )}
-            </TableBody>
-          </Table>
-        </div>
+              <TableHead>Invoked Programs</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredTransactions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6}>
+                  <span className="block w-full text-center">
+                    {programFilter === 'hideVotes'
+                      ? "This block doesn't contain any non-vote transactions"
+                      : 'No transactions found'}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredTransactions.map((tx, i) => {
+                const statusText =
+                  tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
+                const statusVariant =
+                  tx.meta?.err || !tx.signature ? 'destructive' : 'success';
 
-        <Link
-          className={
-            buttonVariants({ variant: 'secondary' }) +
-            ' flex !gap-1 items-center text-xs w-full !text-slate-500'
-          }
-          href="/txs"
-        >
-          VIEW ALL TRANSACTIONS
-          <ArrowRight height={2} width={2} />
-        </Link>
+                return (
+                  <TableRow key={i}>
+                    <TableCell>{tx.index + 1}</TableCell>
+                    <TableCell>
+                      <Badge variant={statusVariant}>{statusText}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      {tx.signature && (
+                        <Signature
+                          signature={tx.signature}
+                          link
+                          truncateChars={48}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {tx.meta !== null ? (
+                        <SolBalance lamports={tx.meta.fee} />
+                      ) : (
+                        'Unknown'
+                      )}
+                    </TableCell>
+                    {showComputeUnits && (
+                      <TableCell className="text-right">
+                        {tx.logTruncated && '>'}
+                        {tx.computeUnits !== undefined
+                          ? new Intl.NumberFormat('en-US').format(
+                              tx.computeUnits
+                            )
+                          : 'Unknown'}
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      {tx.invocations.size === 0
+                        ? 'NA'
+                        : Array.from(tx.invocations.entries())
+                            .sort()
+                            .map(([programId, count], i) => (
+                              <div key={i} className="flex items-center">
+                                <Address
+                                  pubkey={new PublicKey(programId)}
+                                  link
+                                />
+                                <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
+                              </div>
+                            ))}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
       </div>
     </TooltipProvider>
   );
