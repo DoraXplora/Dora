@@ -7,8 +7,9 @@ import {
   CardTitle,
 } from '@/src/components/ui/card';
 import { usePerformanceInfo } from '@/src/providers/stats/solanaClusterStats';
-import { displayTimestamp, formatRelativeTime } from '@/src/utils/date';
+import { displayTimestamp } from '@/src/utils/date';
 import { ToggleGroup, ToggleGroupItem } from '@components/ui/toggle-group';
+import { formatRelative } from 'date-fns';
 import { useState } from 'react';
 import {
   Bar,
@@ -63,7 +64,7 @@ function CustomTpsTooltip({
           {displayTimestamp(payload.fullDate.getTime())}
         </div>
         <div className="text-gray-500 text-xs mb-2">
-          {formatRelativeTime(new Date(payload.fullDate))}
+          {formatRelative(new Date(payload.fullDate), new Date())}
         </div>
         <div className="flex items-center text-sm mb-1">
           <span className="w-2 h-2 rounded-full bg-[#22c55e] mr-2"></span>

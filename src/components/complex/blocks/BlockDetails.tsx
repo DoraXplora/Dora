@@ -6,18 +6,14 @@ import { Block, FetchStatus } from '@/src/providers/block';
 import { CacheEntry } from '@/src/providers/cache';
 import { useCluster } from '@/src/providers/cluster';
 import { lamportsToSolString } from '@/src/utils';
-import {
-  displayTimestamp,
-  displayTimestampUtc,
-  formatRelativeTime,
-} from '@/src/utils/date';
+import { displayTimestamp, displayTimestampUtc } from '@/src/utils/date';
+import { formatRelative } from 'date-fns';
 import { getEpochForSlot } from '@/src/utils/epoch-schedule';
 import { useClusterPath } from '@/src/utils/url';
 import { ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import BlockTransactionsTable from './BlockTransactionsTable';
 import { Epoch } from '../../common/Epoch';
+import BlockTransactionsTable from './BlockTransactionsTable';
 
 interface BlockDetailsProps {
   slot: number;
@@ -88,8 +84,11 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
                       Timestamp (Local)
                     </span>
                     <span>
-                      {formatRelativeTime(new Date(block.blockTime))} (
-                      {displayTimestamp(block.blockTime * 1000, true)})
+                      {formatRelative(
+                        new Date(block.blockTime * 1000),
+                        new Date()
+                      )}{' '}
+                      ({displayTimestamp(block.blockTime * 1000, true)})
                     </span>
                   </div>
                   <div className="grid grid-cols-[100px,1fr] gap-4">
@@ -97,8 +96,11 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
                       Timestamp (UTC)
                     </span>
                     <span>
-                      {formatRelativeTime(new Date(block.blockTime))} (
-                      {displayTimestampUtc(block.blockTime * 1000, true)})
+                      {formatRelative(
+                        new Date(block.blockTime * 1000),
+                        new Date()
+                      )}{' '}
+                      ({displayTimestampUtc(block.blockTime * 1000, true)})
                     </span>
                   </div>
                 </>

@@ -1,7 +1,6 @@
 'use client';
 
 import { Badge } from '@/src/components/ui/badge';
-import { buttonVariants } from '@/src/components/ui/button';
 import { TooltipProvider } from '@/src/components/ui/tooltip';
 import { useBlock, useFetchBlock } from '@/src/providers/block';
 import { useCluster } from '@/src/providers/cluster';
@@ -25,8 +24,7 @@ import {
   VersionedBlockResponse,
   VOTE_PROGRAM_ID,
 } from '@solana/web3.js';
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type TransactionWithInvocations = {
@@ -50,6 +48,14 @@ export function TransactionsTable({
   blockNumber,
   programFilter,
 }: TransactionsTableProps) {
+  if (
+    isNaN(Number(blockNumber)) ||
+    Number(blockNumber) >= Number.MAX_SAFE_INTEGER ||
+    Number(blockNumber) % 1 !== 0
+  ) {
+    notFound();
+  }
+
   const [sortMode, setSortMode] = useState<SortMode>('compute');
   const { cluster } = useCluster();
 
@@ -197,7 +203,9 @@ export function TransactionsTable({
                   <span className="block w-full text-center">
                     {programFilter === 'hideVotes'
                       ? "This block doesn't contain any non-vote transactions"
-                      : 'No transactions found'}
+                      : programFilter === 'all'
+                      ? 'This block does not contain any transactions'
+                      : "This block doesn't contain any vote transactions"}
                   </span>
                 </TableCell>
               </TableRow>

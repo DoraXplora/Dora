@@ -1,7 +1,7 @@
 'use client';
 
 import { buttonVariants } from '@/src/components/ui/button';
-import { displayTimestampUtc, formatRelativeTime } from '@/src/utils/date';
+import { displayTimestampUtc } from '@/src/utils/date';
 import { DataTable, DataTableColumnHeader } from '@components/ui/data-table';
 import { Switch } from '@components/ui/switch';
 import {
@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from '@components/ui/tooltip';
 import { ColumnDef } from '@tanstack/react-table';
+import { formatRelative } from 'date-fns';
 import { ArrowRight, Copy, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -132,7 +133,9 @@ const columns: ColumnDef<Block>[] = [
     cell: ({ row }) => (
       <Tooltip>
         <TooltipTrigger>
-          <p className="w-max">{formatRelativeTime(row.getValue('time'))}</p>
+          <p className="w-max">
+            {formatRelative(row.getValue('time'), new Date())}
+          </p>
         </TooltipTrigger>
         <TooltipContent>
           <p>{displayTimestampUtc((row.getValue('time') as Date).getTime())}</p>

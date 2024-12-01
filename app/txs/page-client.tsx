@@ -15,7 +15,7 @@ import {
 } from '@/src/components/ui/select';
 import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function TransactionsPageClient() {
   const dashboardInfo = useDashboardInfo();
@@ -23,8 +23,33 @@ export default function TransactionsPageClient() {
   const { epochInfo } = dashboardInfo;
   const { blockHeight, absoluteSlot } = epochInfo;
 
+  const isManualNavigation = useRef(false);
+
   const [blockNumber, setBlockNumber] = useState(Number(absoluteSlot));
   const [programFilter, setProgramFilter] = useState<ProgramFilter>('all');
+
+  const goBackward = () => {
+    isManualNavigation.current = true;
+    setBlockNumber(blockNumber - 1);
+  };
+
+  const goForward = () => {
+    isManualNavigation.current = true;
+    setBlockNumber(blockNumber + 1);
+  };
+
+  useEffect(() => {
+    if (
+      epochInfo &&
+      absoluteSlot !== undefined &&
+      !isManualNavigation.current
+    ) {
+      setBlockNumber(Number(absoluteSlot));
+    }
+
+    // Reset manual navigation flag after each update
+    isManualNavigation.current = false;
+  }, [epochInfo, absoluteSlot]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,7 +62,7 @@ export default function TransactionsPageClient() {
 
             <div className="flex items-center text-sm">
               <Button
-                onClick={() => setBlockNumber(blockNumber - 1)}
+                onClick={goBackward}
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
@@ -47,7 +72,7 @@ export default function TransactionsPageClient() {
               </Button>
               <span className="font-mono text-blue-500">{blockNumber}</span>
               <Button
-                onClick={() => setBlockNumber(blockNumber + 1)}
+                onClick={goForward}
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
