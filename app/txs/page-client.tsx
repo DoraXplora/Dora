@@ -13,11 +13,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select';
-import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
+import { useCluster } from '@/src/providers/cluster';
+import {
+  useDashboardInfo,
+  useStatsProvider,
+} from '@/src/providers/stats/solanaClusterStats';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function TransactionsPageClient() {
+  const { cluster } = useCluster();
+  const { setActive } = useStatsProvider();
+
+  useEffect(() => {
+    setActive(true);
+    return () => setActive(false);
+  }, [setActive, cluster]);
+
   const dashboardInfo = useDashboardInfo();
 
   const { epochInfo } = dashboardInfo;
