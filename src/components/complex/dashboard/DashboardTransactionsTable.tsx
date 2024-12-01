@@ -1,10 +1,10 @@
 'use client';
 
-import { ErrorCard } from '@/src/components/common/ErrorCard';
 import {
   TransactionsTable,
   type ProgramFilter,
 } from '@/src/components/complex/txs/TransactionsTable';
+import { Button } from '@/src/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -12,33 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select';
-import { Button } from '@/src/components/ui/button';
-import { useBlock, useFetchBlock } from '@/src/providers/block';
-import { FetchStatus } from '@/src/providers/cache';
-import { useCluster } from '@/src/providers/cluster';
 import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
-import { ClusterStatus } from '@/src/utils/cluster';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function DashboardTransactionsTable() {
   const dashboardInfo = useDashboardInfo();
 
   const { epochInfo } = dashboardInfo;
-  const { blockHeight } = epochInfo;
+  const { blockHeight, absoluteSlot } = epochInfo;
 
-  const [blockNumber, setBlockNumber] = useState(Number(blockHeight));
+  const [blockNumber, setBlockNumber] = useState(Number(absoluteSlot));
   const [programFilter, setProgramFilter] = useState<ProgramFilter>('all');
-
-  const confirmedBlock = useBlock(Number(blockNumber));
-  const fetchBlock = useFetchBlock();
-  const { status } = useCluster();
-  // Fetch block on load
-  useEffect(() => {
-    if (!confirmedBlock && status === ClusterStatus.Connected) {
-      fetchBlock(Number(blockNumber));
-    }
-  }, [blockNumber, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="overflow-x-auto space-y-4">
@@ -81,22 +66,10 @@ export default function DashboardTransactionsTable() {
         </Select>
       </div>
 
-      {confirmedBlock && confirmedBlock.data && confirmedBlock.data.block ? (
-        <TransactionsTable
-          programFilter={programFilter}
-          block={confirmedBlock.data.block}
-        />
-      ) : (
-        <ErrorCard
-          text={
-            FetchStatus.Fetching
-              ? 'Fetching block'
-              : FetchStatus.FetchFailed
-              ? 'Unable to fetch block transactions'
-              : 'Invalid block'
-          }
-        />
-      )}
+      <TransactionsTable
+        programFilter={programFilter}
+        blockNumber={blockNumber}
+      />
     </div>
   );
 }

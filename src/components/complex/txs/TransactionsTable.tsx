@@ -3,10 +3,11 @@
 import { Badge } from '@/src/components/ui/badge';
 import { buttonVariants } from '@/src/components/ui/button';
 import { TooltipProvider } from '@/src/components/ui/tooltip';
+import { useBlock, useFetchBlock } from '@/src/providers/block';
 import { useCluster } from '@/src/providers/cluster';
+import { ClusterStatus } from '@/src/utils/cluster';
 import { parseProgramLogs } from '@/src/utils/program-logs';
 import { Address } from '@components/common/Address';
-import { ErrorCard } from '@components/common/ErrorCard';
 import { Signature } from '@components/common/Signature';
 import { SolBalance } from '@components/common/SolBalance';
 import {
@@ -26,7 +27,7 @@ import {
 } from '@solana/web3.js';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type TransactionWithInvocations = {
   index: number;
@@ -39,24 +40,36 @@ type TransactionWithInvocations = {
 
 export type ProgramFilter = 'all' | 'votes' | 'hideVotes';
 type TransactionsTableProps = {
-  block: VersionedBlockResponse;
+  blockNumber: number;
   programFilter: ProgramFilter;
 };
 
 type SortMode = '' | 'compute' | 'fee';
 
 export function TransactionsTable({
-  block,
+  blockNumber,
   programFilter,
 }: TransactionsTableProps) {
   const [sortMode, setSortMode] = useState<SortMode>('compute');
   const { cluster } = useCluster();
 
-  const { transactions, invokedPrograms } = useMemo(() => {
+  const confirmedBlock = useBlock(Number(blockNumber));
+  const fetchBlock = useFetchBlock();
+  const { status } = useCluster();
+  // Fetch block on load
+  useEffect(() => {
+    if (!confirmedBlock && status === ClusterStatus.Connected) {
+      fetchBlock(Number(blockNumber));
+    }
+  }, [blockNumber, status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const block: VersionedBlockResponse | undefined = confirmedBlock?.data?.block;
+
+  const { transactions } = useMemo(() => {
     const invokedPrograms = new Map<string, number>();
 
-    const transactions: TransactionWithInvocations[] = block.transactions.map(
-      (tx, index) => {
+    const transactions: TransactionWithInvocations[] =
+      block?.transactions.map((tx, index) => {
         let signature: TransactionSignature | undefined;
         if (tx.transaction.signatures.length > 0) {
           signature = tx.transaction.signatures[0];
@@ -112,9 +125,8 @@ export function TransactionsTable({
           meta: tx.meta,
           signature,
         };
-      }
-    );
-    return { invokedPrograms, transactions };
+      }) || [];
+    return { transactions };
   }, [block]);
 
   const [filteredTransactions, showComputeUnits] = useMemo((): [
@@ -146,10 +158,6 @@ export function TransactionsTable({
 
     return [filteredTxs, showComputeUnits];
   }, [programFilter, sortMode, transactions]);
-
-  if (transactions.length === 0) {
-    return <ErrorCard text="This block has no transactions" />;
-  }
 
   return (
     <TooltipProvider>
@@ -184,62 +192,74 @@ export function TransactionsTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTransactions.map((tx, i) => {
-                const statusText =
-                  tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
-                const statusVariant =
-                  tx.meta?.err || !tx.signature ? 'destructive' : 'success';
+              {filteredTransactions.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    <span className="block w-full text-center">
+                      {programFilter === 'hideVotes'
+                        ? "This block doesn't contain any non-vote transactions"
+                        : 'No transactions found'}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredTransactions.map((tx, i) => {
+                  const statusText =
+                    tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
+                  const statusVariant =
+                    tx.meta?.err || !tx.signature ? 'destructive' : 'success';
 
-                return (
-                  <TableRow key={i}>
-                    <TableCell>{tx.index + 1}</TableCell>
-                    <TableCell>
-                      <Badge variant={statusVariant}>{statusText}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {tx.signature && (
-                        <Signature
-                          signature={tx.signature}
-                          link
-                          truncateChars={48}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {tx.meta !== null ? (
-                        <SolBalance lamports={tx.meta.fee} />
-                      ) : (
-                        'Unknown'
-                      )}
-                    </TableCell>
-                    {showComputeUnits && (
-                      <TableCell className="text-right">
-                        {tx.logTruncated && '>'}
-                        {tx.computeUnits !== undefined
-                          ? new Intl.NumberFormat('en-US').format(
-                              tx.computeUnits
-                            )
-                          : 'Unknown'}
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{tx.index + 1}</TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant}>{statusText}</Badge>
                       </TableCell>
-                    )}
-                    <TableCell>
-                      {tx.invocations.size === 0
-                        ? 'NA'
-                        : Array.from(tx.invocations.entries())
-                            .sort()
-                            .map(([programId, count], i) => (
-                              <div key={i} className="flex items-center">
-                                <Address
-                                  pubkey={new PublicKey(programId)}
-                                  link
-                                />
-                                <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
-                              </div>
-                            ))}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      <TableCell>
+                        {tx.signature && (
+                          <Signature
+                            signature={tx.signature}
+                            link
+                            truncateChars={48}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {tx.meta !== null ? (
+                          <SolBalance lamports={tx.meta.fee} />
+                        ) : (
+                          'Unknown'
+                        )}
+                      </TableCell>
+                      {showComputeUnits && (
+                        <TableCell className="text-right">
+                          {tx.logTruncated && '>'}
+                          {tx.computeUnits !== undefined
+                            ? new Intl.NumberFormat('en-US').format(
+                                tx.computeUnits
+                              )
+                            : 'Unknown'}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        {tx.invocations.size === 0
+                          ? 'NA'
+                          : Array.from(tx.invocations.entries())
+                              .sort()
+                              .map(([programId, count], i) => (
+                                <div key={i} className="flex items-center">
+                                  <Address
+                                    pubkey={new PublicKey(programId)}
+                                    link
+                                  />
+                                  <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
+                                </div>
+                              ))}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </div>
