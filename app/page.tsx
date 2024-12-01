@@ -1,30 +1,53 @@
 'use client';
 
+import { BlocksTable } from '@/src/components/complex/blocks/BlocksTable';
+import DashboardTransactionsTable from '@/src/components/complex/dashboard/DashboardTransactionsTable';
+import { StatsCards } from '@/src/components/complex/dashboard/StatsCards';
+import { BlockProvider, useBlock, useFetchBlock } from '@/src/providers/block';
+import { useCluster } from '@/src/providers/cluster';
+import { StatsProvider } from '@/src/providers/stats';
+import { useDashboardInfo } from '@/src/providers/stats/solanaClusterStats';
+import { SupplyProvider } from '@/src/providers/supply';
+import { ClusterStatus } from '@/src/utils/cluster';
 import { Search } from 'lucide-react';
 import dynamic from 'next/dynamic';
-// import { TopMarkets } from '@/src/components/complex/top-markets';
-import { BlocksTable } from '@/src/components/complex/blocks/BlocksTable';
-import { StatsCards } from '@/src/components/complex/home/StatsCards';
-import { TransactionsTable } from '@/src/components/complex/txs/TransactionTable';
-import { StatsProvider } from '@/src/providers/stats';
-import { SupplyProvider } from '@/src/providers/supply';
+import { useEffect, useState } from 'react';
 
 const NetworkStats = dynamic(
-  () => import('@/src/components/complex/home/NetworkStats'),
+  () => import('@/src/components/complex/dashboard/NetworkStats'),
   { ssr: false }
 );
 
-export default function HomePage() {
+export default function DashboardPage() {
   return (
     <StatsProvider>
       <SupplyProvider>
-        <HomeContent />
+        <BlockProvider>
+          <DashboardContent />
+        </BlockProvider>
       </SupplyProvider>
     </StatsProvider>
   );
 }
 
-function HomeContent() {
+function DashboardContent() {
+  const dashboardInfo = useDashboardInfo();
+
+  const { epochInfo } = dashboardInfo;
+  const { blockHeight } = epochInfo;
+
+  const [blockNumber, setBlockNumber] = useState(Number(blockHeight));
+
+  const confirmedBlock = useBlock(Number(blockNumber));
+  const fetchBlock = useFetchBlock();
+  const { status } = useCluster();
+  // Fetch block on load
+  useEffect(() => {
+    if (!confirmedBlock && status === ClusterStatus.Connected) {
+      fetchBlock(Number(blockNumber));
+    }
+  }, [blockNumber, status]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="min-h-screen bg-background">
       <div className="relative">
@@ -42,18 +65,12 @@ function HomeContent() {
       </div>
 
       <main className="container mx-auto px-4 py-8">
-        {/* TODO: <TopMarkets /> */}
         <StatsCards />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <BlocksTable />
-          <TransactionsTable />
+          <DashboardTransactionsTable />
         </div>
-
-        {/* <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          <NFTDashboard />
-          <DefiProtocols />
-        </div> */}
 
         <div className="mt-8">
           <NetworkStats />

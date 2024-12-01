@@ -1,13 +1,14 @@
-import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
-import { TransactionsTable } from '@/src/components/complex/txs/TransactionsTable';
+'use client';
 
-export default function TransactionsPage() {
+import { EpochDetails } from '@/src/components/complex/epochs/EpochDetails';
+import { SearchHeader } from '@/src/components/complex/txs/SearchHeader';
+
+export default function EpochPageClient({ epoch }: { epoch: number }) {
   return (
     <div className="min-h-screen bg-background">
       <SearchHeader />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-xl font-semibold mb-6">Transactions</h1>
-        <TransactionsTable />
+        <EpochDetails epoch={epoch} />
       </main>
     </div>
   );

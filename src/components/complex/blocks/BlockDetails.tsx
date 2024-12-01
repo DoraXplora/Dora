@@ -12,9 +12,12 @@ import {
   formatRelativeTime,
 } from '@/src/utils/date';
 import { getEpochForSlot } from '@/src/utils/epoch-schedule';
+import { useClusterPath } from '@/src/utils/url';
 import { ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import BlockTransactionsTable from './BlockTransactionsTable';
+import { Epoch } from '../../common/Epoch';
 
 interface BlockDetailsProps {
   slot: number;
@@ -23,6 +26,9 @@ interface BlockDetailsProps {
 
 export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
   const { clusterInfo } = useCluster();
+
+  const previousBlockPath = useClusterPath({ pathname: `/blocks/${slot - 1}` });
+  const nextBlockPath = useClusterPath({ pathname: `/blocks/${slot + 1}` });
 
   let content;
   if (!confirmedBlock || confirmedBlock.status === FetchStatus.Fetching) {
@@ -50,19 +56,21 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
               <div className="grid grid-cols-[100px,1fr] gap-4">
                 <span className="text-sm text-muted-foreground">Block</span>
                 <div className="flex items-center gap-2">
+                  {slot !== 0 && (
+                    <Link
+                      href={previousBlockPath}
+                      className={buttonVariants({
+                        variant: 'ghost',
+                        size: 'icon',
+                        className: 'h-6 w-6',
+                      })}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Link>
+                  )}
+                  <span className="font-mono">{slot}</span>
                   <Link
-                    href={`/blocks/${block.parentSlot}`}
-                    className={buttonVariants({
-                      variant: 'ghost',
-                      size: 'icon',
-                      className: 'h-6 w-6',
-                    })}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Link>
-                  <span className="font-mono">{block.parentSlot + 1}</span>
-                  <Link
-                    href={`/blocks/${block.parentSlot + 2}`}
+                    href={nextBlockPath}
                     className={buttonVariants({
                       variant: 'ghost',
                       size: 'icon',
@@ -106,25 +114,16 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
                   </Button>
                 </div>
               </div>
-              <div className="grid grid-cols-[100px,1fr] gap-4">
-                <span className="text-sm text-muted-foreground">Epoch</span>
-                <Link
-                  href={`/epochs/${epoch}`}
-                  className="text-primary hover:underline"
-                >
-                  {epoch}
-                </Link>
-              </div>
+              {epoch ? (
+                <div className="grid grid-cols-[100px,1fr] gap-4">
+                  <span className="text-sm text-muted-foreground">Epoch</span>
+                  <Epoch epoch={epoch} link />
+                </div>
+              ) : null}
               {blockLeader ? (
                 <div className="grid grid-cols-[100px,1fr] gap-4">
                   <span className="text-sm text-muted-foreground">Leader</span>
                   <div className="flex items-center gap-2">
-                    {/* <Link href="#" className="text-primary hover:underline">
-                    {wee}
-                  </Link>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <Copy className="h-4 w-4" />
-                  </Button> */}
                     <Address pubkey={blockLeader} alignRight link />
                   </div>
                 </div>
@@ -170,125 +169,6 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
         </div>
 
         <div className="rounded-lg border bg-card">
-          {/* <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Transactions</h2>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Exclude Vote Program</span>
-                  <Switch
-                    checked={excludeVoteProgram}
-                    onCheckedChange={setExcludeVoteProgram}
-                  />
-                </div>
-                <Select
-                  value={selectedProgram}
-                  onValueChange={setSelectedProgram}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select program" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Programs</SelectItem>
-                    <SelectItem value="system">System Program</SelectItem>
-                    <SelectItem value="token">Token Program</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Signature</TableHead>
-                  <TableHead>Block</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Instructions</TableHead>
-                  <TableHead>By</TableHead>
-                  <TableHead className="text-right">Value (SOL)</TableHead>
-                  <TableHead className="text-right">Fee (SOL)</TableHead>
-                  <TableHead>Programs</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href="#"
-                        className="font-mono text-primary hover:underline"
-                      >
-                        27EgytdgyetBzb...
-                      </Link>
-                      <Button variant="ghost" size="icon" className="h-4 w-4">
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      href="#"
-                      className="font-mono text-primary hover:underline"
-                    >
-                      302980699
-                    </Link>
-                  </TableCell>
-                  <TableCell>23 hrs ago</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">buy</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href="#"
-                        className="font-mono text-primary hover:underline"
-                      >
-                        7WLZNSHMbT...
-                      </Link>
-                      <Button variant="ghost" size="icon" className="h-4 w-4">
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">0.001415</TableCell>
-                  <TableCell className="text-right">0.001415</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <div className="h-4 w-4 rounded bg-primary/20" />
-                      <div className="h-4 w-4 rounded bg-primary/20" />
-                      <Badge variant="secondary">2+</Badge>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">Show</span>
-                <Select value={itemsPerPage} onValueChange={setItemsPerPage}>
-                  <SelectTrigger className="w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span className="text-sm">per page</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">Page 1 of 43</span>
-                <Button variant="outline" size="icon">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div> */}
           <BlockTransactionsTable block={block} />
         </div>
       </>
@@ -301,7 +181,10 @@ export function BlockDetails({ slot, confirmedBlock }: BlockDetailsProps) {
         <h1 className="text-xl font-semibold">Block Details</h1>
         <span className="font-mono text-muted-foreground">{slot}</span>
         <Button variant="outline" size="icon">
-          <Copy className="h-4 w-4" />
+          <Copy
+            className="h-4 w-4"
+            onClick={() => navigator.clipboard.writeText(slot.toString())}
+          />
         </Button>
       </div>
 
