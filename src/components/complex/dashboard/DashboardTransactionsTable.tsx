@@ -51,51 +51,38 @@ export default function DashboardTransactionsTable() {
     isManualNavigation.current = false;
   }, [epochInfo, absoluteSlot]);
 
+  const transactionsTableTitle = (
+    <div className="flex items-center gap-2">
+      <span className="text-sm">Recent Transactions</span>
+      <div className="flex items-center text-sm">
+        <Button
+          onClick={goBackward}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          disabled={blockNumber === 0}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="font-mono text-blue-500">{blockNumber}</span>
+        <Button
+          onClick={goForward}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          disabled={blockNumber >= blockHeight}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="overflow-x-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Recent Transactions</span>
-          <div className="flex items-center text-sm">
-            <Button
-              onClick={goBackward}
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={blockNumber === 0}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="font-mono text-blue-500">{blockNumber}</span>
-            <Button
-              onClick={goForward}
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={blockNumber >= blockHeight}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <Select
-          value={programFilter}
-          onValueChange={(filter: ProgramFilter) => setProgramFilter(filter)}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select program" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Programs</SelectItem>
-            <SelectItem value="system">System Program</SelectItem>
-            <SelectItem value="token">Token Program</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="rounded-lg border pt-2">
+      <div className="rounded-lg">
         <TransactionsTable
-          programFilter={programFilter}
+          title={transactionsTableTitle}
           blockNumber={blockNumber}
         />
 
@@ -103,7 +90,7 @@ export default function DashboardTransactionsTable() {
           className={buttonVariants({
             variant: 'secondary',
             className:
-              'flex !gap-1 items-center text-xs w-full !text-slate-500',
+              'flex !gap-1 items-center text-xs w-full !text-slate-500 rounded-t-none',
           })}
           href="/txs"
         >

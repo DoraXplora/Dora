@@ -1,6 +1,13 @@
 'use client';
 
 import { Badge } from '@/src/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select';
 import { TooltipProvider } from '@/src/components/ui/tooltip';
 import { useBlock, useFetchBlock } from '@/src/providers/block';
 import { useCluster } from '@/src/providers/cluster';
@@ -38,15 +45,15 @@ type TransactionWithInvocations = {
 
 export type ProgramFilter = 'all' | 'votes' | 'hideVotes';
 type TransactionsTableProps = {
+  title?: JSX.Element;
   blockNumber: number;
-  programFilter: ProgramFilter;
 };
 
 type SortMode = '' | 'compute' | 'fee';
 
 export function TransactionsTable({
+  title,
   blockNumber,
-  programFilter,
 }: TransactionsTableProps) {
   if (
     isNaN(Number(blockNumber)) ||
@@ -56,6 +63,7 @@ export function TransactionsTable({
     notFound();
   }
 
+  const [programFilter, setProgramFilter] = useState<ProgramFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('compute');
   const { cluster } = useCluster();
 
@@ -71,7 +79,7 @@ export function TransactionsTable({
 
   const block: VersionedBlockResponse | undefined = confirmedBlock?.data?.block;
 
-  const { transactions } = useMemo(() => {
+  const { transactions, invokedPrograms } = useMemo(() => {
     const invokedPrograms = new Map<string, number>();
 
     const transactions: TransactionWithInvocations[] =
@@ -132,7 +140,8 @@ export function TransactionsTable({
           signature,
         };
       }) || [];
-    return { transactions };
+    return { invokedPrograms, transactions };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [block]);
 
   const [filteredTransactions, showComputeUnits] = useMemo((): [
@@ -148,7 +157,7 @@ export function TransactionsTable({
           // hide vote txs that don't invoke any other programs
           return !(invocations.has(voteFilter) && invocations.size === 1);
         }
-        return invocations.has(programFilter);
+        return invocations.has(voteFilter);
       }
     );
 
@@ -167,108 +176,138 @@ export function TransactionsTable({
 
   return (
     <TooltipProvider>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => setSortMode('')}
-              >
-                #
-              </TableHead>
-              <TableHead>Result</TableHead>
-              <TableHead>Transaction Signature</TableHead>
-              <TableHead
-                className="text-right cursor-pointer"
-                onClick={() => setSortMode('fee')}
-              >
-                Fee
-              </TableHead>
-              {showComputeUnits && (
+      <div className="flex mb-5 items-center justify-between">
+        {title}
+
+        <Select
+          value={programFilter}
+          onValueChange={(filter: ProgramFilter) => setProgramFilter(filter)}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select program" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">
+              All Transactions ({filteredTransactions.length})
+            </SelectItem>
+            <SelectItem value="hideVotes">
+              All Except Votes (
+              {filteredTransactions.length -
+                (invokedPrograms.get(VOTE_PROGRAM_ID.toBase58()) || 0)}
+              )
+            </SelectItem>
+            <SelectItem value="votes">
+              Vote Transactions (
+              {invokedPrograms.get(VOTE_PROGRAM_ID.toBase58()) || 0})
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="rounded-t-lg border pt-2">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => setSortMode('')}
+                >
+                  #
+                </TableHead>
+                <TableHead>Result</TableHead>
+                <TableHead>Transaction Signature</TableHead>
                 <TableHead
                   className="text-right cursor-pointer"
-                  onClick={() => setSortMode('compute')}
+                  onClick={() => setSortMode('fee')}
                 >
-                  Compute
+                  Fee
                 </TableHead>
-              )}
-              <TableHead>Invoked Programs</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTransactions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6}>
-                  <span className="block w-full text-center">
-                    {programFilter === 'hideVotes'
-                      ? "This block doesn't contain any non-vote transactions"
-                      : programFilter === 'all'
-                      ? 'This block does not contain any transactions'
-                      : "This block doesn't contain any vote transactions"}
-                  </span>
-                </TableCell>
+                {showComputeUnits && (
+                  <TableHead
+                    className="text-right cursor-pointer"
+                    onClick={() => setSortMode('compute')}
+                  >
+                    Compute
+                  </TableHead>
+                )}
+                <TableHead>Invoked Programs</TableHead>
               </TableRow>
-            ) : (
-              filteredTransactions.map((tx, i) => {
-                const statusText =
-                  tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
-                const statusVariant =
-                  tx.meta?.err || !tx.signature ? 'destructive' : 'success';
+            </TableHeader>
+            <TableBody>
+              {filteredTransactions.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    <span className="block w-full text-center">
+                      {programFilter === 'hideVotes'
+                        ? "This block doesn't contain any non-vote transactions"
+                        : programFilter === 'all'
+                        ? 'This block does not contain any transactions'
+                        : "This block doesn't contain any vote transactions"}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredTransactions.map((tx, i) => {
+                  const statusText =
+                    tx.meta?.err || !tx.signature ? 'Failed' : 'Success';
+                  const statusVariant =
+                    tx.meta?.err || !tx.signature ? 'destructive' : 'success';
 
-                return (
-                  <TableRow key={i}>
-                    <TableCell>{tx.index + 1}</TableCell>
-                    <TableCell>
-                      <Badge variant={statusVariant}>{statusText}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {tx.signature && (
-                        <Signature
-                          signature={tx.signature}
-                          link
-                          truncateChars={48}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {tx.meta !== null ? (
-                        <SolBalance lamports={tx.meta.fee} />
-                      ) : (
-                        'Unknown'
-                      )}
-                    </TableCell>
-                    {showComputeUnits && (
-                      <TableCell className="text-right">
-                        {tx.logTruncated && '>'}
-                        {tx.computeUnits !== undefined
-                          ? new Intl.NumberFormat('en-US').format(
-                              tx.computeUnits
-                            )
-                          : 'Unknown'}
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{tx.index + 1}</TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariant}>{statusText}</Badge>
                       </TableCell>
-                    )}
-                    <TableCell>
-                      {tx.invocations.size === 0
-                        ? 'NA'
-                        : Array.from(tx.invocations.entries())
-                            .sort()
-                            .map(([programId, count], i) => (
-                              <div key={i} className="flex items-center">
-                                <Address
-                                  pubkey={new PublicKey(programId)}
-                                  link
-                                />
-                                <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
-                              </div>
-                            ))}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                      <TableCell>
+                        {tx.signature && (
+                          <Signature
+                            signature={tx.signature}
+                            link
+                            truncateChars={48}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {tx.meta !== null ? (
+                          <SolBalance lamports={tx.meta.fee} />
+                        ) : (
+                          'Unknown'
+                        )}
+                      </TableCell>
+                      {showComputeUnits && (
+                        <TableCell className="text-right">
+                          {tx.logTruncated && '>'}
+                          {tx.computeUnits !== undefined
+                            ? new Intl.NumberFormat('en-US').format(
+                                tx.computeUnits
+                              )
+                            : 'Unknown'}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        {tx.invocations.size === 0
+                          ? 'NA'
+                          : Array.from(tx.invocations.entries())
+                              .sort()
+                              .map(([programId, count], i) => (
+                                <div key={i} className="flex items-center">
+                                  <Address
+                                    pubkey={new PublicKey(programId)}
+                                    link
+                                  />
+                                  <span className="ml-2 text-muted-foreground">{`(${count})`}</span>
+                                </div>
+                              ))}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </TooltipProvider>
   );
