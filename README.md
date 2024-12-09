@@ -21,7 +21,7 @@ Dora is an advanced, open-source blockchain explorer designed specifically for t
 - [shadcn/ui](https://ui.shadcn.com/) - UI components
 - [Recharts](https://recharts.org/) - Charts and data visualization
 - [next-themes](https://github.com/pacocoursey/next-themes) - Theme management
-- **Analytics Engine:** Custom-built
+- [**Custom built Analytics Engine:**](https://github.com/DoraXplora/DoraAnalytics)
 
 ## Getting Started
 
